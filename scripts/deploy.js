@@ -20,69 +20,60 @@ if (!fs.existsSync(envLocalPath) && fs.existsSync(envExamplePath)) {
   console.log('.env.local created successfully.');
 }
 
-// Function to deploy to Vercel
-const deployToVercel = () => {
-  console.log('Deploying to Vercel...');
+// Get the repository URL from git
+const getRepoUrl = () => {
   try {
-    execSync('npx vercel --prod', { stdio: 'inherit' });
-    console.log('Deployment to Vercel completed successfully!');
+    const remoteUrl = execSync('git config --get remote.origin.url').toString().trim();
+    // Convert SSH URL to HTTPS URL if needed
+    if (remoteUrl.startsWith('git@')) {
+      return remoteUrl
+        .replace('git@github.com:', 'https://github.com/')
+        .replace('.git', '');
+    }
+    return remoteUrl;
   } catch (error) {
-    console.error('Deployment to Vercel failed:', error.message);
+    console.error('Error getting repository URL:', error);
+    process.exit(1);
   }
 };
 
-// Function to deploy to Netlify
-const deployToNetlify = () => {
-  console.log('Deploying to Netlify...');
+// Build the application
+const build = () => {
+  console.log('Building the application...');
   try {
     execSync('npm run build', { stdio: 'inherit' });
-    execSync('npx netlify deploy --prod', { stdio: 'inherit' });
-    console.log('Deployment to Netlify completed successfully!');
+    console.log('Build completed successfully!');
   } catch (error) {
-    console.error('Deployment to Netlify failed:', error.message);
+    console.error('Build failed:', error);
+    process.exit(1);
   }
 };
 
-// Function to deploy to GitHub Pages
-const deployToGitHubPages = () => {
+// Deploy to GitHub Pages
+const deploy = () => {
   console.log('Deploying to GitHub Pages...');
   try {
-    execSync('npm run build', { stdio: 'inherit' });
-    execSync('npx gh-pages -d out', { stdio: 'inherit' });
-    console.log('Deployment to GitHub Pages completed successfully!');
+    // Set the homepage in package.json
+    const repoUrl = getRepoUrl();
+    const homepage = `${repoUrl}/tree/main`;
+    console.log(`Setting homepage to: ${homepage}`);
+    
+    // Deploy using gh-pages
+    execSync('npm run deploy:github', { stdio: 'inherit' });
+    console.log('Deployment completed successfully!');
+    console.log(`Your site should be live at: ${repoUrl.replace('github.com', 'github.io')}`);
   } catch (error) {
-    console.error('Deployment to GitHub Pages failed:', error.message);
+    console.error('Deployment failed:', error);
+    process.exit(1);
   }
 };
 
 // Main function
-const main = async () => {
-  console.log('Todo App Deployment Script');
-  console.log('=========================');
-  console.log('1. Deploy to Vercel');
-  console.log('2. Deploy to Netlify');
-  console.log('3. Deploy to GitHub Pages');
-  console.log('4. Exit');
-  
-  rl.question('Select deployment option (1-4): ', (answer) => {
-    switch (answer) {
-      case '1':
-        deployToVercel();
-        break;
-      case '2':
-        deployToNetlify();
-        break;
-      case '3':
-        deployToGitHubPages();
-        break;
-      case '4':
-        console.log('Exiting...');
-        break;
-      default:
-        console.log('Invalid option. Please try again.');
-    }
-    rl.close();
-  });
+const main = () => {
+  console.log('Starting deployment process...');
+  build();
+  deploy();
+  console.log('Deployment process completed!');
 };
 
 main(); 

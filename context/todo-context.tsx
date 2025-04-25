@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Todo, TodoFilters, AddTodoInput, UpdateTodoInput } from "@/lib/types";
+import { Task, CreateTaskInput } from "@/lib/api/tasks";
 import { toast } from "sonner";
 import { getTasks, createTask, updateTask, deleteTask } from "@/lib/api/tasks";
 
@@ -19,6 +20,22 @@ type TodoContextType = {
 
 const TodoContext = createContext<TodoContextType | undefined>(undefined);
 
+// Convert Task to Todo
+const taskToTodo = (task: Task): Todo => ({
+  id: String(task.id),
+  title: task.title,
+  description: task.description || "",
+  completed: task.completed,
+  createdAt: new Date(task.createdAt),
+  dueDate: new Date(task.dueDate),
+  priority: task.priority,
+  recurring: task.recurring || {
+    isRecurring: false,
+    frequency: null,
+  },
+  imageUrl: task.imageUrl,
+});
+
 export function TodoProvider({ children }: { children: ReactNode }) {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(false);
@@ -35,7 +52,7 @@ export function TodoProvider({ children }: { children: ReactNode }) {
         setLoading(true);
         setError(null);
         const data = await getTasks();
-        setTodos(data);
+        setTodos(data.map(taskToTodo));
       } catch (err) {
         setError('Failed to fetch todos');
         console.error(err);
@@ -52,14 +69,19 @@ export function TodoProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       setError(null);
-      const newTodo = await createTask({
+      const taskInput: CreateTaskInput = {
         title: data.title,
-        description: data.description,
-        dueDate: data.dueDate,
-        priority: data.priority,
-        recurring: data.recurring,
+        description: data.description || "",
+        dueDate: data.dueDate?.toISOString() || new Date().toISOString(),
+        priority: data.priority || "medium",
+        recurring: {
+          isRecurring: false,
+          frequency: null,
+        },
         imageUrl: data.imageUrl,
-      });
+      };
+      const newTask = await createTask(taskInput);
+      const newTodo = taskToTodo(newTask);
       setTodos(prev => [newTodo, ...prev]);
       toast.success("Todo added successfully");
     } catch (err) {
@@ -75,15 +97,19 @@ export function TodoProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       setError(null);
-      const updatedTodo = await updateTask(id, {
+      const updatedTask = await updateTask(id, {
         title: data.title,
-        description: data.description,
+        description: data.description || "",
         completed: data.completed,
         dueDate: data.dueDate,
         priority: data.priority,
-        recurring: data.recurring,
+        recurring: {
+          isRecurring: false,
+          frequency: null,
+        },
         imageUrl: data.imageUrl,
       });
+      const updatedTodo = taskToTodo(updatedTask);
       setTodos(prev => 
         prev.map(todo => 
           todo.id === id ? updatedTodo : todo
@@ -121,15 +147,19 @@ export function TodoProvider({ children }: { children: ReactNode }) {
       try {
         setLoading(true);
         setError(null);
-        const updatedTodo = await updateTask(id, {
+        const updatedTask = await updateTask(id, {
           title: todo.title,
-          description: todo.description,
+          description: todo.description || "",
           completed: !todo.completed,
           dueDate: todo.dueDate,
           priority: todo.priority,
-          recurring: todo.recurring,
+          recurring: {
+            isRecurring: false,
+            frequency: null,
+          },
           imageUrl: todo.imageUrl,
         });
+        const updatedTodo = taskToTodo(updatedTask);
         setTodos(prev => 
           prev.map(t => 
             t.id === id ? updatedTodo : t

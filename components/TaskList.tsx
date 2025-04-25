@@ -61,12 +61,12 @@ export const TaskList = () => {
             <Checkbox
               checked={task.completed}
               onCheckedChange={(checked) => 
-                toggleTask(task.id, checked as boolean)
+                toggleTask(String(task.id), checked as boolean)
               }
             />
             <Input
               value={task.title}
-              onChange={(e) => updateTaskTitle(task.id, e.target.value)}
+              onChange={(e) => updateTaskTitle(String(task.id), e.target.value)}
               className={`flex-1 ${
                 task.completed ? 'line-through text-gray-500' : ''
               }`}
@@ -74,7 +74,7 @@ export const TaskList = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => removeTask(task.id)}
+              onClick={() => removeTask(String(task.id))}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
