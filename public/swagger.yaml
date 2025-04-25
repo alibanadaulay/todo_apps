@@ -1,0 +1,99 @@
+openapi: 3.0.0
+info:
+  title: Todo API
+  description: API for managing todo tasks with image upload support
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+paths:
+  /api/tasks:
+    post:
+      summary: Create a new task
+      description: Create a new task with optional image upload
+      operationId: createTask
+      tags:
+        - Tasks
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - title
+              properties:
+                title:
+                  type: string
+                  description: Title of the task
+                description:
+                  type: string
+                  description: Description of the task
+                priority:
+                  type: string
+                  enum: [low, medium, high]
+                  description: Priority level of the task
+                image:
+                  type: string
+                  format: binary
+                  description: Image file to upload
+      responses:
+        '200':
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Task'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+components:
+  schemas:
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        priority:
+          type: string
+          enum: [low, medium, high]
+        completed:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        dueDate:
+          type: string
+          format: date-time
+        imageUrl:
+          type: string
+          format: uri
+          description: URL to the uploaded image 
