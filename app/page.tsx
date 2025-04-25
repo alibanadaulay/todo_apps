@@ -8,13 +8,15 @@ import { Toaster } from "@/components/ui/sonner";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background to-secondary/20 pb-8">
+    <main className="min-h-screen bg-gradient-to-b from-background to-secondary/20 pb-8 flex justify-center">
       <TodoProvider>
-        <div className="container mx-auto px-4 py-8 max-w-screen-xl">
-          <div className="max-w-3xl mx-auto mb-8">
+        <div className="w-full max-w-[1200px] px-4 py-8">
+          <div className="max-w-2xl mx-auto mb-8">
             <TodoHeader />
           </div>
-          <TodoList />
+          <div className="max-w-7xl mx-auto">
+            <TodoList />
+          </div>
         </div>
         <Toaster position="bottom-right" />
       </TodoProvider>

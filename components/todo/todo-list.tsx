@@ -14,18 +14,20 @@ export function TodoList() {
   
   if (todos.length === 0) {
     return (
-      <div className="max-w-2xl mx-auto">
-        <div className="flex flex-col items-center justify-center p-12 text-center rounded-lg bg-card/50 backdrop-blur-sm border shadow-sm">
-          <div className="w-16 h-16 mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-            <ListPlus className="h-8 w-8 text-primary" />
+      <div className="flex justify-center items-center min-h-[50vh]">
+        <div className="w-full max-w-md mx-auto">
+          <div className="flex flex-col items-center justify-center p-12 text-center rounded-lg bg-card/50 backdrop-blur-sm border shadow-sm">
+            <div className="w-16 h-16 mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+              <ListPlus className="h-8 w-8 text-primary" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">No todos yet</h3>
+            <p className="text-muted-foreground mb-6 max-w-sm">
+              Get started by adding your first todo. Stay organized and track your tasks effectively.
+            </p>
+            <Button variant="outline" size="lg" className="font-medium">
+              Add Your First Todo
+            </Button>
           </div>
-          <h3 className="text-xl font-semibold mb-2">No todos yet</h3>
-          <p className="text-muted-foreground mb-6 max-w-sm">
-            Get started by adding your first todo. Stay organized and track your tasks effectively.
-          </p>
-          <Button variant="outline" size="lg" className="font-medium">
-            Add Your First Todo
-          </Button>
         </div>
       </div>
     );
@@ -33,15 +35,17 @@ export function TodoList() {
   
   if (filteredTodos.length === 0) {
     return (
-      <div className="max-w-2xl mx-auto">
-        <div className="flex flex-col items-center justify-center p-12 text-center rounded-lg bg-card/50 backdrop-blur-sm border shadow-sm">
-          <div className="w-16 h-16 mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-            <Inbox className="h-8 w-8 text-primary" />
+      <div className="flex justify-center items-center min-h-[50vh]">
+        <div className="w-full max-w-md mx-auto">
+          <div className="flex flex-col items-center justify-center p-12 text-center rounded-lg bg-card/50 backdrop-blur-sm border shadow-sm">
+            <div className="w-16 h-16 mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+              <Inbox className="h-8 w-8 text-primary" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">No matching todos</h3>
+            <p className="text-muted-foreground mb-6 max-w-sm">
+              Try adjusting your filters to find what you're looking for.
+            </p>
           </div>
-          <h3 className="text-xl font-semibold mb-2">No matching todos</h3>
-          <p className="text-muted-foreground mb-6 max-w-sm">
-            Try adjusting your filters to find what you're looking for.
-          </p>
         </div>
       </div>
     );
