@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Todo, TodoFilters, AddTodoInput, UpdateTodoInput } from "@/lib/types";
+import { Task } from "@/lib/api/tasks";
 import { toast } from "sonner";
 import { getTasks, createTask, updateTask, deleteTask } from "@/lib/api/tasks";
 
@@ -19,6 +20,20 @@ type TodoContextType = {
 
 const TodoContext = createContext<TodoContextType | undefined>(undefined);
 
+const convertTaskToTodo = (task: Task): Todo => ({
+  id: String(task.id),
+  title: task.title,
+  description: task.description,
+  completed: task.completed,
+  createdAt: new Date(task.createdAt),
+  dueDate: new Date(task.dueDate),
+  priority: task.priority,
+  recurring: {
+    isRecurring: false,
+    frequency: null
+  }
+});
+
 export function TodoProvider({ children }: { children: ReactNode }) {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(false);
@@ -35,7 +50,7 @@ export function TodoProvider({ children }: { children: ReactNode }) {
         setLoading(true);
         setError(null);
         const data = await getTasks();
-        setTodos(data);
+        setTodos(data.map(convertTaskToTodo));
       } catch (err) {
         setError('Failed to fetch todos');
         console.error(err);
@@ -52,7 +67,7 @@ export function TodoProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       setError(null);
-      const newTodo = await createTask({
+      const newTask = await createTask({
         title: data.title,
         description: data.description,
         dueDate: data.dueDate,
@@ -60,7 +75,7 @@ export function TodoProvider({ children }: { children: ReactNode }) {
         recurring: data.recurring,
         imageUrl: data.imageUrl,
       });
-      setTodos(prev => [newTodo, ...prev]);
+      setTodos(prev => [convertTaskToTodo(newTask), ...prev]);
       toast.success("Todo added successfully");
     } catch (err) {
       setError('Failed to add todo');
@@ -75,7 +90,7 @@ export function TodoProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       setError(null);
-      const updatedTodo = await updateTask(id, {
+      const updatedTask = await updateTask(id, {
         title: data.title,
         description: data.description,
         completed: data.completed,
@@ -86,7 +101,7 @@ export function TodoProvider({ children }: { children: ReactNode }) {
       });
       setTodos(prev => 
         prev.map(todo => 
-          todo.id === id ? updatedTodo : todo
+          todo.id === id ? convertTaskToTodo(updatedTask) : todo
         )
       );
       toast.success("Todo updated successfully");
@@ -121,7 +136,7 @@ export function TodoProvider({ children }: { children: ReactNode }) {
       try {
         setLoading(true);
         setError(null);
-        const updatedTodo = await updateTask(id, {
+        const updatedTask = await updateTask(id, {
           title: todo.title,
           description: todo.description,
           completed: !todo.completed,
@@ -132,7 +147,7 @@ export function TodoProvider({ children }: { children: ReactNode }) {
         });
         setTodos(prev => 
           prev.map(t => 
-            t.id === id ? updatedTodo : t
+            t.id === id ? convertTaskToTodo(updatedTask) : t
           )
         );
       } catch (err) {
