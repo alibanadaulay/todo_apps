@@ -1,9 +1,11 @@
 import axios from 'axios';
 
 // Use environment variable for API URL with fallback to localhost
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+//const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+const API_BASE_URL = 'https://todobe-production-e862.up.railway.app/api/v1' 
 
-export interface Task {
+
+export interface Task { 
   id: string | number;
   title: string;
   description?: string;
